@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Installer</title>
+    
+    {# Tailwind CSS v4 will be compiled and included here #}
+    <link rel="stylesheet" href="{{ asset('bundles/installer/css/app.css') }}">
+</head>
+<body class="bg-gray-50">
+    <div id="installer-root"></div>
+    
+    {# React app bundle #}
+    <script type="module" src="{{ asset('bundles/installer/js/app.js') }}"></script>
+</body>
+</html>

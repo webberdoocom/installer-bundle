@@ -1,0 +1,5 @@
+# Installer Bundle Routes
+installer_routes:
+    resource: ../../Controller/
+    type: attribute
+    prefix: /install

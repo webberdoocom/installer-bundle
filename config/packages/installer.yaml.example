@@ -1,0 +1,77 @@
+# Installer Bundle Configuration Example
+# Copy this file to your project's config/packages/installer.yaml and configure
+
+installer:
+    # List all entities that should have tables created during installation
+    entities:
+        - App\Entity\User
+        - App\Entity\Account
+        - App\Entity\Transaction
+        - App\Entity\Category
+        - App\Entity\Budget
+        # Add all your Doctrine entities here
+    
+    # Admin user configuration
+    # Configure these based on your User entity structure
+    admin_user:
+        entity_class: App\Entity\User
+        email_field: email              # The property name in your User entity for email
+        password_field: password        # The property name for password
+        roles_field: roles              # The property name for roles array
+        full_name_field: fullName       # The property name for full name
+        is_active_field: isActive       # The property name for active status
+        admin_roles:
+            - ROLE_ADMIN
+            - ROLE_USER
+    
+    # Database configuration
+    database:
+        config_path: '%kernel.project_dir%/config/db.yaml'
+        driver: pdo_mysql               # Database driver (pdo_mysql, pdo_pgsql, etc.)
+        charset: utf8mb4                # Character set
+    
+    # System requirements check
+    requirements:
+        php_version: '8.2.0'            # Minimum PHP version
+        php_extensions:
+            # Required extensions for Symfony 7.3
+            - ctype
+            - iconv
+            - pcre
+            - session
+            - simplexml
+            - tokenizer
+            # Database
+            - pdo_mysql
+            - mbstring
+            # Application specific
+            - json
+            - intl
+        recommended_extensions:
+            # Recommended but not required
+            - curl
+            - zip
+            - gd
+    
+    # Application configuration
+    app_config:
+        config_path: '%kernel.project_dir%/config/app_config.yaml'
+        # Add custom parameters that users should configure during installation
+        parameters:
+            # Example: API keys, email settings, etc.
+            # - name: OPENAI_API_KEY
+            #   label: OpenAI API Key
+            #   type: text
+            #   required: false
+            #   default: ''
+            # - name: MAIL_FROM_ADDRESS
+            #   label: Email From Address
+            #   type: email
+            #   required: true
+            #   default: 'noreply@example.com'
+    
+    # Installation marker file path
+    install_marker_path: '%kernel.project_dir%/var/install_completed'
+    
+    # Route prefix for installer
+    route_prefix: '/install'

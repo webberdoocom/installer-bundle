@@ -1,0 +1,110 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  php-tests:
+    name: PHP ${{ matrix.php-version }} Tests
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        php-version: ['8.2', '8.3']
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: ctype, iconv, pcre, session, simplexml, tokenizer, pdo_mysql, mbstring, json, intl
+          coverage: none
+      
+      - name: Validate composer.json
+        run: composer validate --strict
+      
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+      
+      - name: Run PHP CS Fixer
+        run: vendor/bin/php-cs-fixer fix --dry-run --diff
+        if: matrix.php-version == '8.3'
+      
+      - name: Run PHPStan
+        run: vendor/bin/phpstan analyse
+        if: matrix.php-version == '8.3'
+      
+      - name: Run tests
+        run: vendor/bin/phpunit
+  
+  frontend-build:
+    name: Frontend Build
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: assets/package-lock.json
+      
+      - name: Install dependencies
+        working-directory: ./assets
+        run: npm ci
+      
+      - name: Build assets
+        working-directory: ./assets
+        run: npm run build
+      
+      - name: Check for build errors
+        run: |
+          if [ ! -d "src/Resources/public/js" ]; then
+            echo "Build failed - no output files found"
+            exit 1
+          fi
+      
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: built-assets
+          path: src/Resources/public/
+          retention-days: 7
+  
+  security-check:
+    name: Security Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+      
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+      
+      - name: Security audit (PHP)
+        run: composer audit
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      
+      - name: Install frontend dependencies
+        working-directory: ./assets
+        run: npm ci
+      
+      - name: Security audit (Node.js)
+        working-directory: ./assets
+        run: npm audit --audit-level=moderate

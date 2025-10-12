@@ -1,0 +1,8 @@
+parameters:
+    level: 8
+    paths:
+        - src
+    excludePaths:
+        - src/Resources
+    ignoreErrors:
+        - '#Parameter \#1 \$objectOrClass of class ReflectionClass constructor expects class-string#'

@@ -1,0 +1,42 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+
+    # Controllers
+    Webberdoo\InstallerBundle\Controller\:
+        resource: '../../Controller'
+        tags: ['controller.service_arguments']
+
+    # Services
+    Webberdoo\InstallerBundle\Service\SystemRequirementsChecker:
+        arguments:
+            $requirements: '%installer.requirements%'
+            $projectDir: '%kernel.project_dir%'
+
+    Webberdoo\InstallerBundle\Service\DatabaseConfigWriter:
+        arguments:
+            $dbConfig: '%installer.database%'
+
+    Webberdoo\InstallerBundle\Service\SchemaInstaller:
+        arguments:
+            $entities: '%installer.entities%'
+            $dbConfig: '%installer.database%'
+            $projectDir: '%kernel.project_dir%'
+
+    Webberdoo\InstallerBundle\Service\AdminUserCreator:
+        arguments:
+            $adminConfig: '%installer.admin_user%'
+            $dbConfig: '%installer.database%'
+            $projectDir: '%kernel.project_dir%'
+
+    Webberdoo\InstallerBundle\Service\AppConfigWriter:
+        arguments:
+            $appConfig: '%installer.app_config%'
+            $installMarkerPath: '%installer.install_marker_path%'
+
+    Webberdoo\InstallerBundle\Service\InstallationStatusChecker:
+        arguments:
+            $adminConfig: '%installer.admin_user%'
+            $em: '@doctrine.orm.entity_manager'
