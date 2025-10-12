@@ -5,7 +5,7 @@ import { resolve } from 'path';
 export default defineConfig({
   plugins: [react()],
   build: {
-    outDir: '../src/Resources/public',
+    outDir: '../public',
     emptyOutDir: true,
     manifest: true,
     rollupOptions: {
