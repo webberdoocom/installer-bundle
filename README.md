@@ -1,14 +1,16 @@
 # Webberdoo Installer Bundle
 
-A complete, reusable Symfony installer bundle with a modern React + Tailwind CSS v4 frontend. This bundle provides a web-based installation wizard for Symfony applications with configurable entities, database setup, and admin user creation.
+A complete, reusable Symfony installer bundle with a modern React + Tailwind CSS v4 frontend. This bundle provides a web-based installation wizard for Symfony applications with **automatic User entity detection**, configurable entities, database setup, and admin user creation.
 
 ## Features
 
 ✅ **Modern UI** - React with Tailwind CSS v4  
+✅ **Auto-Detection** - Automatically detects User entity and field names  
+✅ **Minimal Configuration** - Just list your entities, everything else is automatic  
 ✅ **Step-by-step Installation** - System requirements, database, tables, admin user, app config  
-✅ **Fully Configurable** - Configure entities, admin user fields, and custom parameters  
 ✅ **Safe Schema Installation** - Only creates tables, never drops existing ones  
 ✅ **Dynamic Entity Support** - Add any Doctrine entities to install  
+✅ **Auto .env Update** - Automatically updates DATABASE_URL in your .env file  
 ✅ **Standalone Installation** - Works without existing Symfony configuration  
 ✅ **Installation Status Tracking** - Resume interrupted installations  
 
@@ -35,26 +37,40 @@ return [
 
 **Note:** Routes are automatically loaded. No need to modify `config/routes.yaml`.
 
-### 3. Configure the Bundle
+### 3. Configure the Bundle (Minimal Setup)
 
-Create `config/packages/installer.yaml`:
+Create `config/packages/installer.yaml` with **just your entities**:
 
 ```yaml
 installer:
-    # Just list your entities! User entity and fields are auto-detected
     entities:
         - App\Entity\User
-        - App\Entity\Post
-        - App\Entity\Category
-        # Add more as needed
+        # Add more entities as needed:
+        # - App\Entity\Post
+        # - App\Entity\Category
+```
+
+**That's it!** The bundle will automatically:
+- ✅ Detect your User entity (must implement `UserInterface`)
+- ✅ Auto-detect field names (email, password, roles, etc.)
+- ✅ Use sensible defaults for database driver, paths, and requirements
+- ✅ Update your `.env` file with `DATABASE_URL`
+
+### 3b. Optional Advanced Configuration
+
+If you need to customize, here's the full configuration with defaults:
+
+```yaml
+installer:
+    entities:
+        - App\Entity\User
     
-    # Database configuration
+    # Optional: Only needed if you want to change defaults
     database:
-        config_path: '%kernel.project_dir%/config/db.yaml'
-        driver: pdo_mysql
+        driver: pdo_mysql          # pdo_mysql, pdo_pgsql, pdo_sqlite
         charset: utf8mb4
     
-    # System requirements
+    # Optional: Customize PHP requirements
     requirements:
         php_version: '8.2.0'
         php_extensions:
@@ -67,21 +83,14 @@ installer:
             - pdo_mysql
             - mbstring
             - json
-        recommended_extensions:
-            - curl
-            - zip
-            - gd
     
-    # Application configuration
+    # Optional: Add custom application parameters
     app_config:
-        config_path: '%kernel.project_dir%/config/app_config.yaml'
-        parameters: []  # Add custom parameters if needed
-    
-    # Installation marker
-    install_marker_path: '%kernel.project_dir%/var/install_completed'
-    
-    # Route prefix
-    route_prefix: '/install'
+        parameters:
+            - name: APP_NAME
+              label: Application Name
+              type: text
+              required: true
 ```
 
 ### 4. Build Frontend Assets
@@ -118,7 +127,8 @@ Navigate to: `http://your-app.com/install`
 2. **Database Configuration**
    - Enter database credentials
    - Tests connection before saving
-   - Writes to `config/db.yaml`
+   - Automatically updates `.env` file with `DATABASE_URL`
+   - Writes config to `config/db.yaml`
 
 3. **Install Tables**
    - Creates all configured entity tables
@@ -139,10 +149,31 @@ Navigate to: `http://your-app.com/install`
 
 ## Configuration Examples
 
-### Adding Custom Parameters
+### Minimal Configuration (Recommended)
+
+The simplest setup - just list your entities:
 
 ```yaml
 installer:
+    entities:
+        - App\Entity\User
+        - App\Entity\Post
+        - App\Entity\Comment
+```
+
+The bundle automatically:
+- Finds your User entity (implements `UserInterface`)
+- Detects fields: `email`, `password`, `roles`, `fullName`, `isActive`
+- Uses `pdo_mysql` driver with `utf8mb4` charset
+- Sets sensible PHP version and extension requirements
+
+### Adding Custom Application Parameters
+
+```yaml
+installer:
+    entities:
+        - App\Entity\User
+    
     app_config:
         parameters:
             - name: OPENAI_API_KEY
@@ -156,20 +187,78 @@ installer:
               required: true
 ```
 
-### Custom User Entity
-
-If your User entity uses different field names:
+### PostgreSQL Database
 
 ```yaml
 installer:
-    admin_user:
-        entity_class: App\Entity\CustomUser
-        email_field: emailAddress      # Instead of 'email'
-        password_field: hashedPassword # Instead of 'password'
-        roles_field: userRoles         # Instead of 'roles'
-        full_name_field: name          # Instead of 'fullName'
-        is_active_field: active        # Instead of 'isActive'
+    entities:
+        - App\Entity\User
+    
+    database:
+        driver: pdo_pgsql
+        charset: utf8
 ```
+
+### Manually Specify User Entity (Advanced)
+
+Only needed if auto-detection doesn't work or you have multiple User entities:
+
+```yaml
+installer:
+    entities:
+        - App\Entity\User
+        - App\Entity\Customer
+    
+    admin_user:
+        entity_class: App\Entity\User  # Explicitly specify which one
+        admin_roles:
+            - ROLE_ADMIN
+            - ROLE_SUPER_ADMIN
+```
+
+---
+
+## How Auto-Detection Works
+
+### User Entity Detection
+
+The bundle automatically finds your User entity by:
+1. Scanning all entities listed in your configuration
+2. Finding the one that implements `Symfony\Component\Security\Core\User\UserInterface`
+3. No manual configuration needed!
+
+### Field Name Detection
+
+The bundle intelligently detects field names using common naming patterns:
+
+| Field Type | Detected Names |
+|-----------|----------------|
+| **Email** | `email`, `username`, `user`, `login` |
+| **Password** | `password` |
+| **Roles** | `roles` |
+| **Full Name** | `fullName`, `full_name`, `name`, `displayname` |
+| **Active Status** | `isActive`, `is_active`, `active`, `enabled`, `status` |
+
+### Your User Entity
+
+The installer works with any User entity structure:
+
+```php
+class User implements UserInterface
+{
+    private ?string $email = null;      // ✅ Detected as email field
+    private ?string $password = null;   // ✅ Detected as password field
+    private array $roles = [];          // ✅ Detected as roles field
+    
+    // Optional fields - will be set if they exist:
+    private ?string $fullName = null;   // ✅ Auto-detected
+    private bool $isActive = true;      // ✅ Auto-detected
+    
+    // Standard getters/setters...
+}
+```
+
+If a field doesn't exist or doesn't have a setter, the installer simply skips it - no errors!
 
 ---
 
