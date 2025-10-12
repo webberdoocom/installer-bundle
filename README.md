@@ -51,7 +51,7 @@ installer:
     # Database configuration
     database:
         config_path: '%kernel.project_dir%/config/db.yaml'
-        driver: mysql
+        driver: pdo_mysql
         charset: utf8mb4
     
     # System requirements

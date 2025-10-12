@@ -70,9 +70,12 @@ class DatabaseConfigWriter
     public function testConnection(array $credentials): array
     {
         try {
+            // Convert Doctrine driver to PDO driver
+            $pdoDriver = $this->convertToPdoDriver($this->dbConfig['driver']);
+            
             $dsn = sprintf(
                 '%s:host=%s;port=%d;dbname=%s;charset=%s',
-                $this->dbConfig['driver'],
+                $pdoDriver,
                 $credentials['host'],
                 (int) $credentials['port'],
                 $credentials['db_name'],
@@ -90,5 +93,18 @@ class DatabaseConfigWriter
         } catch (\PDOException $e) {
             return ['success' => false, 'message' => 'Connection failed: ' . $e->getMessage()];
         }
+    }
+
+    /**
+     * Convert Doctrine driver name to PDO driver name
+     */
+    private function convertToPdoDriver(string $doctrineDriver): string
+    {
+        return match($doctrineDriver) {
+            'pdo_mysql' => 'mysql',
+            'pdo_pgsql' => 'pgsql',
+            'pdo_sqlite' => 'sqlite',
+            default => $doctrineDriver,
+        };
     }
 }
