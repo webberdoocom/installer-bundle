@@ -7,7 +7,7 @@ function CompletionScreen() {
 
   return (
     <div className="card text-center">
-      <div className="mt-8 mb-6">
+      <div className="mt-16 mb-6">
         <div className="inline-flex items-center justify-center w-20 h-20 bg-green-100 rounded-full">
           <svg className="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
