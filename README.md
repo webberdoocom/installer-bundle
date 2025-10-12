@@ -19,7 +19,7 @@ A complete, reusable Symfony installer bundle with a modern React + Tailwind CSS
 ### 1. Install via Composer
 
 ```bash
-composer require webberdoo/installer-bundle
+composer require webberdoocom/installer-bundle
 ```
 
 ### 2. Register the Bundle
@@ -97,7 +97,7 @@ installer:
 ### 4. Build Frontend Assets
 
 ```bash
-cd vendor/webberdoo/installer-bundle/assets
+cd vendor/webberdoocom/installer-bundle/assets
 npm install
 npm run build
 ```
