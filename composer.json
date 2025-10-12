@@ -1,5 +1,5 @@
 {
-    "name": "webberdoo/installer-bundle",
+    "name": "webberdoocom/installer-bundle",
     "description": "A reusable Symfony installer bundle with React and Tailwind CSS frontend. Installs Symfony database tables and admin user.",
     "type": "symfony-bundle",
     "keywords": ["symfony", "bundle", "installer", "react", "tailwind", "symfony-installer", "webberdoo-installer-bundle"],
