@@ -1,0 +1,20 @@
+
+  <bg=blue;fg=white>                                        </>
+  <bg=blue;fg=white> What's next for Installer Bundle?      </>
+  <bg=blue;fg=white>                                        </>
+
+  * <fg=blue>Configure your entities</> in <comment>config/packages/installer.yaml</>
+    Update the <comment>entities</> list with all your Doctrine entities
+  
+  * <fg=blue>Customize admin user settings</> if your User entity has different field names
+  
+  * <fg=blue>Build frontend assets:</> 
+    <comment>cd vendor/webberdoocom/installer-bundle/assets && npm install && npm run build</>
+  
+  * <fg=blue>Install assets:</> 
+    <comment>php bin/console assets:install --symlink</>
+  
+  * <fg=blue>Access the installer:</> 
+    Navigate to <comment>http://your-app.com/install</> in your browser
+  
+  * Read the documentation at <comment>https://github.com/webberdoocom/installer-bundle</>

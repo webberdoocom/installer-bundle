@@ -33,6 +33,8 @@ return [
 ];
 ```
 
+**Note:** Routes are automatically loaded. No need to modify `config/routes.yaml`.
+
 ### 3. Configure the Bundle
 
 Create `config/packages/installer.yaml`:
