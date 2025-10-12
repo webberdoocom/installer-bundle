@@ -51,12 +51,17 @@ class DatabaseConfigWriter
 
     public function validateConfig(array $db): bool
     {
-        $required = ['dbname', 'host', 'port', 'user', 'password'];
+        $required = ['dbname', 'host', 'port', 'user'];
         
         foreach ($required as $field) {
             if (!isset($db[$field]) || $db[$field] === '') {
                 return false;
             }
+        }
+
+        // Password must exist but can be empty
+        if (!isset($db['password'])) {
+            return false;
         }
 
         return true;
