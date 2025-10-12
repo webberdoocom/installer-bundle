@@ -71,6 +71,17 @@ function App() {
     );
   }
 
+  // Completion screen gets special layout
+  if (currentStep === 6) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="w-full max-w-2xl">
+          <CompletionScreen />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -82,15 +93,13 @@ function App() {
       </div>
 
       {/* Step Indicator */}
-      {currentStep < 6 && (
-        <div className="max-w-6xl mx-auto px-4 py-8">
-          <StepIndicator 
-            steps={STEPS} 
-            currentStep={currentStep}
-            installationStatus={installationStatus}
-          />
-        </div>
-      )}
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        <StepIndicator 
+          steps={STEPS} 
+          currentStep={currentStep}
+          installationStatus={installationStatus}
+        />
+      </div>
 
       {/* Main Content */}
       <div className="max-w-4xl mx-auto px-4 pb-12">
@@ -113,10 +122,6 @@ function App() {
           
           {currentStep === 5 && (
             <AppConfig onNext={handleNext} onBack={handleBack} />
-          )}
-          
-          {currentStep === 6 && (
-            <CompletionScreen />
           )}
         </div>
       </div>
