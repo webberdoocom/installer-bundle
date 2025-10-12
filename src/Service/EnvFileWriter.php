@@ -16,9 +16,9 @@ class EnvFileWriter
      */
     public function updateDatabaseUrl(array $credentials): bool
     {
-        $envFile = $this->projectDir . '/.env';
+        $envFile = $this->getEnvFilePath();
         
-        if (!file_exists($envFile)) {
+        if (!$envFile || !file_exists($envFile)) {
             return false;
         }
 
@@ -58,7 +58,27 @@ class EnvFileWriter
      */
     public function isEnvWritable(): bool
     {
-        $envFile = $this->projectDir . '/.env';
-        return file_exists($envFile) && is_writable($envFile);
+        $envFile = $this->getEnvFilePath();
+        return $envFile && file_exists($envFile) && is_writable($envFile);
+    }
+
+    /**
+     * Get the path to the .env file (checks multiple locations)
+     */
+    private function getEnvFilePath(): ?string
+    {
+        // Check project root first (most common)
+        $rootEnv = $this->projectDir . '/.env';
+        if (file_exists($rootEnv)) {
+            return $rootEnv;
+        }
+
+        // Check config directory (alternative location)
+        $configEnv = $this->projectDir . '/config/.env';
+        if (file_exists($configEnv)) {
+            return $configEnv;
+        }
+
+        return null;
     }
 }
