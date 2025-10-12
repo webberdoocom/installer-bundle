@@ -11,6 +11,10 @@ services:
         public: true
 
     # Services
+    Webberdoo\InstallerBundle\Service\UserEntityDetector:
+        arguments:
+            $entities: '%installer.entities%'
+
     Webberdoo\InstallerBundle\Service\SystemRequirementsChecker:
         arguments:
             $requirements: '%installer.requirements%'

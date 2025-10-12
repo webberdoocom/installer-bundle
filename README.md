@@ -41,23 +41,12 @@ Create `config/packages/installer.yaml`:
 
 ```yaml
 installer:
-    # Entities to install (required)
+    # Just list your entities! User entity and fields are auto-detected
     entities:
         - App\Entity\User
-        - App\Entity\Account
-        - App\Entity\Transaction
-        # Add all your entities here
-    
-    # Admin user configuration
-    admin_user:
-        entity_class: App\Entity\User
-        email_field: email              # Property name for email
-        password_field: password        # Property name for password
-        roles_field: roles              # Property name for roles
-        full_name_field: fullName       # Property name for full name
-        is_active_field: isActive       # Property name for active status
-        admin_roles:
-            - ROLE_ADMIN
+        - App\Entity\Post
+        - App\Entity\Category
+        # Add more as needed
     
     # Database configuration
     database:

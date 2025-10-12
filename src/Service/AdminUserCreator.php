@@ -14,23 +14,34 @@ class AdminUserCreator
     private array $dbConfig;
     private string $projectDir;
     private UserPasswordHasherInterface $passwordHasher;
+    private UserEntityDetector $userEntityDetector;
 
     public function __construct(
         array $adminConfig,
         array $dbConfig,
         string $projectDir,
-        UserPasswordHasherInterface $passwordHasher
+        UserPasswordHasherInterface $passwordHasher,
+        UserEntityDetector $userEntityDetector
     ) {
         $this->adminConfig = $adminConfig;
         $this->dbConfig = $dbConfig;
         $this->projectDir = $projectDir;
         $this->passwordHasher = $passwordHasher;
+        $this->userEntityDetector = $userEntityDetector;
     }
 
     public function createAdmin(array $dbCredentials, array $adminData): array
     {
         try {
-            $entityClass = $this->adminConfig['entity_class'];
+            // Auto-detect User entity if not configured
+            $entityClass = $this->adminConfig['entity_class'] ?? $this->userEntityDetector->detectUserEntity();
+
+            if (!$entityClass) {
+                return [
+                    'success' => false,
+                    'message' => 'No User entity found. Make sure your User entity implements UserInterface and is listed in installer.entities.'
+                ];
+            }
 
             if (!class_exists($entityClass)) {
                 return [
@@ -38,6 +49,9 @@ class AdminUserCreator
                     'message' => "User entity class not found: {$entityClass}"
                 ];
             }
+
+            // Auto-detect fields
+            $fields = $this->userEntityDetector->detectFields($entityClass);
 
             // Validate admin data
             $validation = $this->validateAdminData($adminData);
@@ -52,7 +66,7 @@ class AdminUserCreator
             $em = $this->createEntityManager($dbCredentials);
 
             // Check if admin already exists
-            $emailField = $this->adminConfig['email_field'];
+            $emailField = $fields['email'] ?? 'email';
             $exists = $em->createQueryBuilder()
                 ->select('u')
                 ->from($entityClass, 'u')
@@ -70,7 +84,7 @@ class AdminUserCreator
 
             // Create admin user using dynamic setters
             $user = new $entityClass();
-            $this->setUserProperties($user, $adminData);
+            $this->setUserProperties($user, $adminData, $fields);
 
             // Persist
             try {
@@ -110,50 +124,58 @@ class AdminUserCreator
             return ['valid' => false, 'message' => 'Password is required'];
         }
 
-        if (empty($data['fullName'])) {
-            return ['valid' => false, 'message' => 'Full name is required'];
-        }
-
+        // Full name is optional
         return ['valid' => true];
     }
 
-    private function setUserProperties(object $user, array $data): void
+    private function setUserProperties(object $user, array $data, array $fields): void
     {
         // Email
-        $emailSetter = 'set' . ucfirst($this->adminConfig['email_field']);
-        if (method_exists($user, $emailSetter)) {
-            $user->$emailSetter(strtolower(trim($data['email'])));
+        if ($fields['email']) {
+            $emailSetter = 'set' . ucfirst($fields['email']);
+            if (method_exists($user, $emailSetter)) {
+                $user->$emailSetter(strtolower(trim($data['email'])));
+            }
         }
 
         // Password (hashed)
-        $passwordSetter = 'set' . ucfirst($this->adminConfig['password_field']);
-        if (method_exists($user, $passwordSetter)) {
-            $hashedPassword = $this->passwordHasher->hashPassword($user, $data['password']);
-            $user->$passwordSetter($hashedPassword);
+        if ($fields['password']) {
+            $passwordSetter = 'set' . ucfirst($fields['password']);
+            if (method_exists($user, $passwordSetter)) {
+                $hashedPassword = $this->passwordHasher->hashPassword($user, $data['password']);
+                $user->$passwordSetter($hashedPassword);
+            }
         }
 
-        // Full Name
-        $fullNameSetter = 'set' . ucfirst($this->adminConfig['full_name_field']);
-        if (method_exists($user, $fullNameSetter)) {
-            $user->$fullNameSetter(trim($data['fullName']));
+        // Full Name (optional)
+        if ($fields['fullName'] && !empty($data['fullName'])) {
+            $fullNameSetter = 'set' . ucfirst($fields['fullName']);
+            if (method_exists($user, $fullNameSetter)) {
+                $user->$fullNameSetter(trim($data['fullName']));
+            }
         }
 
         // Roles
-        $rolesSetter = 'set' . ucfirst($this->adminConfig['roles_field']);
-        if (method_exists($user, $rolesSetter)) {
-            $user->$rolesSetter($this->adminConfig['admin_roles']);
+        if ($fields['roles']) {
+            $rolesSetter = 'set' . ucfirst($fields['roles']);
+            if (method_exists($user, $rolesSetter)) {
+                $user->$rolesSetter($this->adminConfig['admin_roles']);
+            }
         }
 
-        // Is Active
-        $isActiveSetter = 'set' . ucfirst($this->adminConfig['is_active_field']);
-        if (method_exists($user, $isActiveSetter)) {
-            $user->$isActiveSetter(true);
+        // Is Active (optional)
+        if ($fields['isActive']) {
+            $isActiveSetter = 'set' . ucfirst($fields['isActive']);
+            if (method_exists($user, $isActiveSetter)) {
+                $user->$isActiveSetter(true);
+            }
         }
     }
 
     private function createEntityManager(array $dbCredentials): EntityManager
     {
-        $reflection = new \ReflectionClass($this->adminConfig['entity_class']);
+        $entityClass = $this->adminConfig['entity_class'] ?? $this->userEntityDetector->detectUserEntity();
+        $reflection = new \ReflectionClass($entityClass);
         $entityPath = dirname($reflection->getFileName());
 
         $ormConfig = ORMSetup::createAttributeMetadataConfiguration([$entityPath], false);

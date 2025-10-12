@@ -2,27 +2,26 @@
 # Copy this file to your project's config/packages/installer.yaml and configure
 
 installer:
-    # List all entities that should have tables created during installation
+    # List of entity classes to create database tables for
+    # The User entity will be auto-detected (must implement UserInterface)
     entities:
         - App\Entity\User
         - App\Entity\Account
         - App\Entity\Transaction
         - App\Entity\Category
         - App\Entity\Budget
-        # Add all your Doctrine entities here
+        # Add more entities as needed:
+        # - App\Entity\Post
     
-    # Admin user configuration
-    # Configure these based on your User entity structure
-    admin_user:
-        entity_class: App\Entity\User
-        email_field: email              # The property name in your User entity for email
-        password_field: password        # The property name for password
-        roles_field: roles              # The property name for roles array
-        full_name_field: fullName       # The property name for full name
-        is_active_field: isActive       # The property name for active status
-        admin_roles:
-            - ROLE_ADMIN
-            - ROLE_USER
+    # Admin user configuration (optional - auto-detects User entity and fields)
+    # Leave commented out to use auto-detection. Fields are auto-detected from your User entity!
+    # admin_user:
+    #     admin_roles:
+    #         - ROLE_ADMIN
+    # 
+    # Advanced: Manually specify if auto-detection doesn't work
+    # admin_user:
+    #     entity_class: App\Entity\CustomUser
     
     # Database configuration
     database:

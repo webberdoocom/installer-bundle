@@ -5,18 +5,14 @@ installer:
     # List all entities that should have tables created during installation
     entities:
         - App\Entity\User
-        # Add your Doctrine entities here
+        # - App\Entity\Post
+        # - App\Entity\Category
     
-    # Admin user configuration
-    admin_user:
-        entity_class: App\Entity\User
-        email_field: email              
-        password_field: password        
-        roles_field: roles              
-        full_name_field: fullName       
-        is_active_field: isActive       
-        admin_roles:
-            - ROLE_ADMIN
+    # Admin user (auto-detects User entity from entities list)
+    # Uncomment to customize:
+    # admin_user:
+    #     admin_roles:
+    #         - ROLE_ADMIN
     
     # Database configuration
     database:
