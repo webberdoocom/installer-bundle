@@ -51,8 +51,8 @@ class InstallerApiController extends AbstractController
                 ], 400);
             }
 
-            // Validate required fields
-            $required = ['db_name', 'host', 'port', 'db_user', 'password'];
+            // Validate required fields (password can be empty for localhost)
+            $required = ['db_name', 'host', 'port', 'db_user'];
             foreach ($required as $field) {
                 if (!isset($data[$field]) || $data[$field] === '') {
                     return new JsonResponse([
@@ -60,6 +60,14 @@ class InstallerApiController extends AbstractController
                         'message' => "Field {$field} is required"
                     ], 400);
                 }
+            }
+            
+            // Password must be present but can be empty
+            if (!isset($data['password'])) {
+                return new JsonResponse([
+                    'success' => false,
+                    'message' => 'Field password is required'
+                ], 400);
             }
 
             // Test connection first
