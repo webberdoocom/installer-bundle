@@ -46,7 +46,6 @@ installer:
             - mbstring
             # Application specific
             - json
-            - intl
         recommended_extensions:
             # Recommended but not required
             - curl

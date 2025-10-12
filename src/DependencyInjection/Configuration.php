@@ -90,7 +90,7 @@ class Configuration implements ConfigurationInterface
                             ->scalarPrototype()->end()
                             ->defaultValue([
                                 'ctype', 'iconv', 'pcre', 'session', 'simplexml', 
-                                'tokenizer', 'pdo_mysql', 'mbstring', 'json', 'intl'
+                                'tokenizer', 'pdo_mysql', 'mbstring', 'json'
                             ])
                         ->end()
                         ->arrayNode('recommended_extensions')

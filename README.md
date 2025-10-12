@@ -78,7 +78,6 @@ installer:
             - pdo_mysql
             - mbstring
             - json
-            - intl
         recommended_extensions:
             - curl
             - zip
