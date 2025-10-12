@@ -39,7 +39,8 @@ class InstallerApiController extends AbstractController
     #[Route('/database-config', name: 'database_config', methods: ['POST'])]
     public function databaseConfig(
         Request $request,
-        DatabaseConfigWriter $writer
+        DatabaseConfigWriter $writer,
+        \Webberdoo\InstallerBundle\Service\EnvFileWriter $envWriter
     ): JsonResponse {
         try {
             $data = json_decode($request->getContent(), true);
@@ -76,8 +77,16 @@ class InstallerApiController extends AbstractController
                 return new JsonResponse($connectionTest, 400);
             }
 
-            // Write configuration
+            // Write configuration to config/db.yaml
             $writer->writeConfig($data);
+
+            // Update .env file with DATABASE_URL
+            if (!$envWriter->updateDatabaseUrl($data)) {
+                return new JsonResponse([
+                    'success' => false,
+                    'message' => 'Database config saved but failed to update .env file. Please check file permissions.'
+                ], 500);
+            }
 
             return new JsonResponse([
                 'success' => true,

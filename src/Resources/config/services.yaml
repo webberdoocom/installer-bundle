@@ -20,6 +20,10 @@ services:
             $requirements: '%installer.requirements%'
             $projectDir: '%kernel.project_dir%'
 
+    Webberdoo\InstallerBundle\Service\EnvFileWriter:
+        arguments:
+            $projectDir: '%kernel.project_dir%'
+
     Webberdoo\InstallerBundle\Service\DatabaseConfigWriter:
         arguments:
             $dbConfig: '%installer.database%'
