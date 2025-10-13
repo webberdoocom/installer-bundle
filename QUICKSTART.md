@@ -21,7 +21,21 @@ return [
 ];
 ```
 
-## Step 3: Create Configuration
+## Step 3: Register Routes
+
+Add to `config/routes.yaml`:
+
+```yaml
+installer:
+    resource:
+        path: ../vendor/webberdoocom/installer-bundle/src/Controller/
+        namespace: Webberdoo\InstallerBundle\Controller
+    type: attribute
+```
+
+**Note:** Don't add a prefix - the `/install` route is already defined in the controller.
+
+## Step 4: Create Configuration
 
 Create `config/packages/installer.yaml`:
 
@@ -37,7 +51,7 @@ installer:
 
 **Full configuration example:** See `vendor/webberdoo/installer-bundle/config/packages/installer.yaml.example`
 
-## Step 4: Build Frontend Assets
+## Step 5: Build Frontend Assets
 
 ```bash
 cd vendor/webberdoo/installer-bundle/assets
@@ -46,13 +60,13 @@ npm run build
 cd ../../../..
 ```
 
-## Step 5: Install Assets
+## Step 6: Install Assets
 
 ```bash
 php bin/console assets:install --symlink
 ```
 
-## Step 6: Run the Installer
+## Step 7: Run the Installer
 
 Start your Symfony dev server:
 
@@ -196,7 +210,10 @@ Add to `config/routes.yaml`:
 ```yaml
 # Only load installer if not installed
 installer:
-    resource: '@InstallerBundle/Resources/config/routes.yaml'
+    resource:
+        path: ../vendor/webberdoocom/installer-bundle/src/Controller/
+        namespace: Webberdoo\InstallerBundle\Controller
+    type: attribute
     when: '@=!file_exists(parameter("kernel.project_dir") ~ "/var/install_completed")'
 ```
 

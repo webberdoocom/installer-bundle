@@ -35,9 +35,21 @@ return [
 ];
 ```
 
-**Note:** Routes are automatically loaded. No need to modify `config/routes.yaml`.
+### 3. Register Routes
 
-### 3. Configure the Bundle (Minimal Setup)
+Add to `config/routes.yaml`:
+
+```yaml
+installer:
+    resource:
+        path: ../vendor/webberdoocom/installer-bundle/src/Controller/
+        namespace: Webberdoo\InstallerBundle\Controller
+    type: attribute
+```
+
+**Important:** The route prefix `/install` is already defined in the controller attributes, so don't add a prefix here.
+
+### 4. Configure the Bundle (Minimal Setup)
 
 Create `config/packages/installer.yaml` with **just your entities**:
 
@@ -56,7 +68,7 @@ installer:
 - ✅ Use sensible defaults for database driver, paths, and requirements
 - ✅ Update your `.env` file with `DATABASE_URL`
 
-### 3b. Optional Advanced Configuration
+### 4b. Optional Advanced Configuration
 
 If you need to customize, here's the full configuration with defaults:
 
@@ -93,7 +105,7 @@ installer:
               required: true
 ```
 
-### 4. Build Frontend Assets
+### 5. Build Frontend Assets
 
 ```bash
 cd vendor/webberdoocom/installer-bundle/assets
@@ -103,7 +115,7 @@ npm run build
 
 The assets will be built to `src/Resources/public/`.
 
-### 5. Install Assets to Public Directory
+### 6. Install Assets to Public Directory
 
 ```bash
 php bin/console assets:install --symlink
@@ -299,15 +311,20 @@ The bundle exposes the following API endpoints:
 
 ### After Installation
 
-1. **Remove Installer Route** (Optional but recommended)
+1. **Disable Installer After Installation** (Optional but recommended)
    
-   Add to `config/routes.yaml`:
+   Update your `config/routes.yaml` to conditionally load the installer:
    ```yaml
-   # Disable installer after installation
+   # Only load installer if not yet completed
    installer:
-       resource: '@InstallerBundle/Resources/config/routes.yaml'
+       resource:
+           path: ../vendor/webberdoocom/installer-bundle/src/Controller/
+           namespace: Webberdoo\InstallerBundle\Controller
+       type: attribute
        when: '@=!file_exists(parameter("kernel.project_dir") ~ "/var/install_completed")'
    ```
+   
+   This prevents access to the installer after installation is complete.
 
 2. **Installation Marker**
    
