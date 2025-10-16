@@ -5,6 +5,7 @@
 
 # Build files
 /src/Resources/public/
+/public/
 /assets/dist/
 
 # IDE files
