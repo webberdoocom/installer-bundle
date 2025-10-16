@@ -13,9 +13,13 @@ function SystemCheck({ onNext }) {
   const performSystemCheck = async () => {
     try {
       const response = await axios.get('/install/api/system-check');
+      console.log('System check response:', response.data);
       if (response.data.success) {
         setChecks(response.data.checks);
         setCanProceed(response.data.can_proceed);
+        console.log('canProceed set to:', response.data.can_proceed);
+      } else {
+        console.error('API returned success:false');
       }
     } catch (error) {
       console.error('System check failed:', error);

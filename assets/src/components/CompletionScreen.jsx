@@ -1,8 +1,11 @@
 import React from 'react';
+import axios from 'axios';
 
 function CompletionScreen() {
   const handleGoToLogin = () => {
-    window.location.href = '/login';
+    // Use the same baseURL we configured for axios
+    const baseURL = axios.defaults.baseURL || '';
+    window.location.href = `${baseURL}/login`;
   };
 
   return (
