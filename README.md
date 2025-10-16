@@ -111,6 +111,8 @@ installer:
 cd vendor/webberdoocom/installer-bundle/assets
 npm install
 npm run build
+
+
 ```
 
 The assets will be built to `src/Resources/public/`.
