@@ -51,7 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.1.0] - 2025-01-17
+## [2.2.2] - 2025-01-17
 
 ### Added
 - **Optional SMTP Configuration Step**: New step 5 in the installer for configuring email settings
