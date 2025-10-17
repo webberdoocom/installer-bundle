@@ -2,12 +2,17 @@ import React from 'react';
 
 function CompletionScreen() {
   const handleGoToLogin = () => {
-    // Navigate to login by replacing 'install' with 'login' in current path
-    const newPath = window.location.pathname.replace(/\/install.*$/, '/login');
+    // Get the current pathname and replace /install with /login
+    const pathname = window.location.pathname;
+    const newPath = pathname.replace(/\/install.*$/, '/login');
     
-    // Use location.assign with a properly constructed URL
-    const fullUrl = new URL(newPath, window.location.origin);
-    window.location.assign(fullUrl.href);
+    // Build the full URL manually
+    const protocol = window.location.protocol; // http: or https:
+    const host = window.location.host; // 127.0.0.1:8000
+    const loginUrl = `${protocol}//${host}${newPath}`;
+    
+    console.log('Redirecting to:', loginUrl); // Debug log
+    window.location.href = loginUrl;
   };
 
   return (
