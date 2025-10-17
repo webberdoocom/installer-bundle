@@ -5,10 +5,11 @@ function CompletionScreen() {
     // Calculate base path from current URL
     // If we're at /install or /myapp/install, get the base path
     const currentPath = window.location.pathname;
-    const basePath = currentPath.replace(/\/install\/?.*$/, '') || '';
+    const basePath = currentPath.replace(/\/install.*$/, '');
     
-    // Redirect to login page
-    window.location.href = `${basePath}/login`;
+    // Construct full URL with origin to ensure proper redirect
+    const loginPath = basePath ? `${basePath}/login` : '/login';
+    window.location.href = `${window.location.origin}${loginPath}`;
   };
 
   return (
