@@ -51,6 +51,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.2.3] - 2025-01-17
+
+### Fixed
+- **Critical:** Built assets now included in repository for proper Composer distribution
+- Fixed login redirect issue on completion screen (was redirecting to `http://login/`)
+- Login redirect now works correctly with subfolders and all domain configurations
+- Added debug logging to help troubleshoot redirect issues
+
+### Changed
+- Updated `.gitignore` to track `src/Resources/public/` directory
+- Updated README to clarify that assets are pre-built and included
+
+---
+
 ## [2.2.2] - 2025-01-17
 
 ### Added
