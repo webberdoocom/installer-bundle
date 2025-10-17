@@ -106,19 +106,9 @@ installer:
               required: true
 ```
 
-### 5. Build Frontend Assets
+### 5. Install Assets to Public Directory
 
-```bash
-cd vendor/webberdoocom/installer-bundle/assets
-npm install
-npm run build
-
-
-```
-
-The assets will be built to `src/Resources/public/`.
-
-### 6. Install Assets to Public Directory
+**Note:** The frontend assets are **pre-built and included** in the package. You don't need to build them yourself unless you're modifying the source code.
 
 ```bash
 php bin/console assets:install --symlink
