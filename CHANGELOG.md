@@ -88,6 +88,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.3.0] - 2025-01-17
+
+### Changed
+- **Breaking:** Template namespace updated to use `@Installer` instead of hardcoded paths
+- Improved Twig namespace registration via `prepend()` in Extension
+- Better compatibility with Composer path repositories for local development
+- Enhanced bundle auto-loading support
+
+### Fixed
+- Fixed template loading issues when using path repositories
+- Proper Twig paths configuration for bundle templates
+
+### Improved
+- Better development workflow with local path repository support
+- Clearer documentation on local development setup
+
+---
+
 ## [Unreleased]
 
 ### Planned Features
