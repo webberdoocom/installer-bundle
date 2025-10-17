@@ -2,8 +2,13 @@ import React from 'react';
 
 function CompletionScreen() {
   const handleGoToLogin = () => {
-    // Redirect to login page using relative path
-    window.location.href = '/login';
+    // Calculate base path from current URL
+    // If we're at /install or /myapp/install, get the base path
+    const currentPath = window.location.pathname;
+    const basePath = currentPath.replace(/\/install\/?.*$/, '') || '';
+    
+    // Redirect to login page
+    window.location.href = `${basePath}/login`;
   };
 
   return (
