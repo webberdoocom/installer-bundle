@@ -11,16 +11,19 @@ class InstallationStatusChecker
     private AppConfigWriter $appConfigWriter;
     private array $adminConfig;
     private ?EntityManagerInterface $em;
+    private string $projectDir;
 
     public function __construct(
         DatabaseConfigWriter $dbConfigWriter,
         AppConfigWriter $appConfigWriter,
         array $adminConfig,
+        string $projectDir,
         ?EntityManagerInterface $em = null
     ) {
         $this->dbConfigWriter = $dbConfigWriter;
         $this->appConfigWriter = $appConfigWriter;
         $this->adminConfig = $adminConfig;
+        $this->projectDir = $projectDir;
         $this->em = $em;
     }
 
@@ -30,6 +33,7 @@ class InstallationStatusChecker
             'database_config' => false,
             'database_tables' => false,
             'admin_user' => false,
+            'smtp_config' => false,
             'app_config' => false
         ];
 
@@ -73,6 +77,19 @@ class InstallationStatusChecker
             }
         }
 
+        // Check SMTP config (optional - if admin_user is set, consider SMTP complete)
+        if ($status['admin_user']) {
+            // Check if smtp.yaml exists or mark as complete by default
+            $smtpConfigPath = $this->projectDir . '/config/smtp.yaml';
+            if (file_exists($smtpConfigPath)) {
+                $status['smtp_config'] = true;
+            } else {
+                // SMTP is optional, so we mark it as complete if skipped
+                // This allows the installer to proceed
+                $status['smtp_config'] = true;
+            }
+        }
+
         // Check app config (only if all previous steps are complete)
         if ($this->appConfigWriter->isInstalled() &&
             $status['database_config'] &&
@@ -84,6 +101,7 @@ class InstallationStatusChecker
         $completed = $status['database_config'] &&
                     $status['database_tables'] &&
                     $status['admin_user'] &&
+                    $status['smtp_config'] &&
                     $status['app_config'];
 
         return [

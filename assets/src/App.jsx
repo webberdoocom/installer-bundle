@@ -5,6 +5,7 @@ import SystemCheck from './components/SystemCheck';
 import DatabaseConfig from './components/DatabaseConfig';
 import TableInstaller from './components/TableInstaller';
 import AdminSetup from './components/AdminSetup';
+import SmtpSetup from './components/SmtpSetup';
 import AppConfig from './components/AppConfig';
 import CompletionScreen from './components/CompletionScreen';
 
@@ -13,7 +14,8 @@ const STEPS = [
   { id: 2, name: 'Database Configuration', key: 'database_config' },
   { id: 3, name: 'Install Tables', key: 'database_tables' },
   { id: 4, name: 'Admin User', key: 'admin_user' },
-  { id: 5, name: 'App Configuration', key: 'app_config' }
+  { id: 5, name: 'SMTP Configuration', key: 'smtp_config' },
+  { id: 6, name: 'App Configuration', key: 'app_config' }
 ];
 
 function App() {
@@ -33,7 +35,9 @@ function App() {
         
         // Determine current step based on status
         if (response.data.completed) {
-          setCurrentStep(6); // Show completion screen
+          setCurrentStep(7); // Show completion screen
+        } else if (response.data.status.smtp_config) {
+          setCurrentStep(6);
         } else if (response.data.status.admin_user) {
           setCurrentStep(5);
         } else if (response.data.status.database_tables) {
@@ -72,7 +76,7 @@ function App() {
   }
 
   // Completion screen gets special layout
-  if (currentStep === 6) {
+  if (currentStep === 7) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="w-full max-w-2xl">
@@ -121,6 +125,10 @@ function App() {
           )}
           
           {currentStep === 5 && (
+            <SmtpSetup onNext={handleNext} onBack={handleBack} />
+          )}
+          
+          {currentStep === 6 && (
             <AppConfig onNext={handleNext} onBack={handleBack} />
           )}
         </div>

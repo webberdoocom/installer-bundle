@@ -40,6 +40,12 @@ services:
             $dbConfig: '%installer.database%'
             $projectDir: '%kernel.project_dir%'
 
+    Webberdoo\InstallerBundle\Service\SmtpConfigWriter:
+        arguments:
+            $adminConfig: '%installer.admin_user%'
+            $dbConfig: '%installer.database%'
+            $projectDir: '%kernel.project_dir%'
+
     Webberdoo\InstallerBundle\Service\AppConfigWriter:
         arguments:
             $appConfig: '%installer.app_config%'
@@ -48,4 +54,5 @@ services:
     Webberdoo\InstallerBundle\Service\InstallationStatusChecker:
         arguments:
             $adminConfig: '%installer.admin_user%'
+            $projectDir: '%kernel.project_dir%'
             $em: '@doctrine.orm.entity_manager'

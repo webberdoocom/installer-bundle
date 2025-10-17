@@ -51,6 +51,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.0] - 2025-01-17
+
+### Added
+- **Optional SMTP Configuration Step**: New step 5 in the installer for configuring email settings
+- SMTP fields support in user entity (smtpHost, smtpPort, smtpUsername, smtpPassword, smtpEncryption, smtpFromEmail, smtpFromName)
+- `SmtpConfigWriter` service to handle SMTP configuration persistence
+- SMTP configuration saved to both user entity and `config/smtp.yaml`
+- "Skip for Now" option for SMTP configuration
+- Auto-detection of SMTP fields in user entities
+- Smart validation for SMTP form (only validates when fields are filled)
+
+### Changed
+- Updated step count from 5 to 6 steps
+- Enhanced `UserEntityDetector` to detect SMTP-related fields
+- Updated `InstallationStatusChecker` to track SMTP configuration status
+- Modified frontend step progression to include SMTP step after admin user creation
+
+### Improved
+- Better user experience with optional configuration steps
+- Flexible SMTP field naming (supports camelCase and snake_case variations)
+
+---
+
 ## [Unreleased]
 
 ### Planned Features

@@ -10,6 +10,7 @@ use Webberdoo\InstallerBundle\Service\SystemRequirementsChecker;
 use Webberdoo\InstallerBundle\Service\DatabaseConfigWriter;
 use Webberdoo\InstallerBundle\Service\SchemaInstaller;
 use Webberdoo\InstallerBundle\Service\AdminUserCreator;
+use Webberdoo\InstallerBundle\Service\SmtpConfigWriter;
 use Webberdoo\InstallerBundle\Service\AppConfigWriter;
 use Webberdoo\InstallerBundle\Service\InstallationStatusChecker;
 
@@ -176,7 +177,49 @@ class InstallerApiController extends AbstractController
     }
 
     /**
-     * Step 5: Save Application Configuration
+     * Step 5: Save SMTP Configuration
+     */
+    #[Route('/smtp-config', name: 'smtp_config', methods: ['POST'])]
+    public function smtpConfig(
+        Request $request,
+        DatabaseConfigWriter $dbWriter,
+        SmtpConfigWriter $smtpWriter
+    ): JsonResponse {
+        try {
+            $data = json_decode($request->getContent(), true);
+
+            if (!$data) {
+                return new JsonResponse([
+                    'success' => false,
+                    'message' => 'Invalid JSON data'
+                ], 400);
+            }
+
+            // Read database configuration
+            $dbConfig = $dbWriter->readConfig();
+
+            if (!$dbConfig || !$dbWriter->validateConfig($dbConfig)) {
+                return new JsonResponse([
+                    'success' => false,
+                    'message' => 'Database configuration not found. Complete Step 2 first.'
+                ], 400);
+            }
+
+            // Save SMTP configuration
+            $result = $smtpWriter->saveSmtpConfig($dbConfig, $data);
+
+            return new JsonResponse($result, $result['success'] ? 200 : 500);
+
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Error saving SMTP configuration: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Step 6: Save Application Configuration
      */
     #[Route('/app-config', name: 'app_config', methods: ['POST'])]
     public function appConfig(

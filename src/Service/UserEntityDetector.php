@@ -48,6 +48,13 @@ class UserEntityDetector
             'roles' => null,
             'fullName' => null,
             'isActive' => null,
+            'smtpHost' => null,
+            'smtpPort' => null,
+            'smtpUsername' => null,
+            'smtpPassword' => null,
+            'smtpEncryption' => null,
+            'smtpFromEmail' => null,
+            'smtpFromName' => null,
         ];
 
         // Check for common property names
@@ -78,6 +85,29 @@ class UserEntityDetector
             // Active status field
             if (in_array($lowerName, ['isactive', 'is_active', 'active', 'enabled', 'status'])) {
                 $fields['isActive'] = $name;
+            }
+
+            // SMTP fields
+            if (in_array($lowerName, ['smtphost', 'smtp_host', 'mailhost', 'mail_host'])) {
+                $fields['smtpHost'] = $name;
+            }
+            if (in_array($lowerName, ['smtpport', 'smtp_port', 'mailport', 'mail_port'])) {
+                $fields['smtpPort'] = $name;
+            }
+            if (in_array($lowerName, ['smtpusername', 'smtp_username', 'smtpuser', 'smtp_user', 'mailuser', 'mail_user'])) {
+                $fields['smtpUsername'] = $name;
+            }
+            if (in_array($lowerName, ['smtppassword', 'smtp_password', 'smtppass', 'smtp_pass', 'mailpassword', 'mail_password'])) {
+                $fields['smtpPassword'] = $name;
+            }
+            if (in_array($lowerName, ['smtpencryption', 'smtp_encryption', 'mailencryption', 'mail_encryption', 'smtptls', 'smtp_tls'])) {
+                $fields['smtpEncryption'] = $name;
+            }
+            if (in_array($lowerName, ['smtpfromemail', 'smtp_from_email', 'mailfrom', 'mail_from', 'fromemail', 'from_email'])) {
+                $fields['smtpFromEmail'] = $name;
+            }
+            if (in_array($lowerName, ['smtpfromname', 'smtp_from_name', 'mailfromname', 'mail_from_name', 'fromname', 'from_name'])) {
+                $fields['smtpFromName'] = $name;
             }
         }
 
