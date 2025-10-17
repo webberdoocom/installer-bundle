@@ -7,7 +7,8 @@ A complete, reusable Symfony installer bundle with a modern React + Tailwind CSS
 ✅ **Modern UI** - React with Tailwind CSS v4  
 ✅ **Auto-Detection** - Automatically detects User entity and field names  
 ✅ **Minimal Configuration** - Just list your entities, everything else is automatic  
-✅ **Step-by-step Installation** - System requirements, database, tables, admin user, app config  
+✅ **Step-by-step Installation** - System requirements, database, tables, admin user, SMTP (optional), app config  
+✅ **Optional SMTP Configuration** - Configure email settings during installation or skip for later  
 ✅ **Safe Schema Installation** - Only creates tables, never drops existing ones  
 ✅ **Dynamic Entity Support** - Add any Doctrine entities to install  
 ✅ **Auto .env Update** - Automatically updates DATABASE_URL in your .env file  
@@ -154,7 +155,12 @@ Navigate to: `http://your-app.com/install`
    - Password strength indicator
    - Email validation
 
-5. **Application Configuration**
+5. **SMTP Configuration (Optional)**
+   - Configure email/SMTP settings
+   - Saved to both user entity and `config/smtp.yaml`
+   - Can be skipped and configured later
+
+6. **Application Configuration**
    - Set base URL and path
    - Configure custom parameters
    - Creates installation marker
@@ -252,6 +258,13 @@ The bundle intelligently detects field names using common naming patterns:
 | **Roles** | `roles` |
 | **Full Name** | `fullName`, `full_name`, `name`, `displayname` |
 | **Active Status** | `isActive`, `is_active`, `active`, `enabled`, `status` |
+| **SMTP Host** | `smtpHost`, `smtp_host`, `mailHost`, `mail_host` |
+| **SMTP Port** | `smtpPort`, `smtp_port`, `mailPort`, `mail_port` |
+| **SMTP Username** | `smtpUsername`, `smtp_username`, `smtpUser`, `smtp_user` |
+| **SMTP Password** | `smtpPassword`, `smtp_password`, `smtpPass`, `smtp_pass` |
+| **SMTP Encryption** | `smtpEncryption`, `smtp_encryption`, `smtpTls`, `smtp_tls` |
+| **SMTP From Email** | `smtpFromEmail`, `smtp_from_email`, `fromEmail`, `from_email` |
+| **SMTP From Name** | `smtpFromName`, `smtp_from_name`, `fromName`, `from_name` |
 
 ### Your User Entity
 
@@ -268,11 +281,173 @@ class User implements UserInterface
     private ?string $fullName = null;   // ✅ Auto-detected
     private bool $isActive = true;      // ✅ Auto-detected
     
+    // SMTP fields (optional) - Auto-detected if present:
+    private ?string $smtpHost = null;      // ✅ For email configuration
+    private ?int $smtpPort = null;         // ✅ Auto-detected
+    private ?string $smtpUsername = null;  // ✅ Auto-detected
+    private ?string $smtpPassword = null;  // ✅ Auto-detected
+    private ?string $smtpEncryption = null; // ✅ Auto-detected (tls/ssl)
+    private ?string $smtpFromEmail = null; // ✅ Auto-detected
+    private ?string $smtpFromName = null;  // ✅ Auto-detected
+    
     // Standard getters/setters...
 }
 ```
 
 If a field doesn't exist or doesn't have a setter, the installer simply skips it - no errors!
+
+---
+
+## SMTP Configuration
+
+### Overview
+
+The installer includes an optional SMTP configuration step that allows users to set up email settings during installation. This feature is **completely optional** and can be skipped if you prefer to configure email settings later.
+
+### How It Works
+
+1. **During Installation** - Step 5 prompts for SMTP settings:
+   - SMTP Host (e.g., `smtp.gmail.com`)
+   - SMTP Port (default: `587`)
+   - SMTP Username
+   - SMTP Password
+   - Encryption (TLS/SSL/None)
+   - From Email (optional)
+   - From Name (optional)
+
+2. **Storage** - SMTP settings are saved in two locations:
+   - **User Entity** - If your User entity has SMTP fields, they're automatically populated
+   - **Config File** - Settings are also saved to `config/smtp.yaml` for easy access
+
+3. **Skip Option** - Users can click "Skip for Now" to bypass this step and configure SMTP later
+
+### Setting Up Your User Entity for SMTP
+
+To enable SMTP configuration during installation, add these optional fields to your User entity:
+
+```php
+<?php
+
+namespace App\Entity;
+
+use Symfony\Component\Security\Core\User\UserInterface;
+use Doctrine\ORM\Mapping as ORM;
+
+#[ORM\Entity]
+#[ORM\Table(name: 'users')]
+class User implements UserInterface
+{
+    // Required fields...
+    #[ORM\Column(type: 'string', length: 180, unique: true)]
+    private ?string $email = null;
+
+    #[ORM\Column(type: 'string')]
+    private ?string $password = null;
+
+    #[ORM\Column(type: 'json')]
+    private array $roles = [];
+
+    // SMTP Configuration Fields (Optional)
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $smtpHost = null;
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private ?int $smtpPort = null;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $smtpUsername = null;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $smtpPassword = null;
+
+    #[ORM\Column(type: 'string', length: 50, nullable: true)]
+    private ?string $smtpEncryption = null;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $smtpFromEmail = null;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $smtpFromName = null;
+
+    // Getters and setters...
+    public function getSmtpHost(): ?string { return $this->smtpHost; }
+    public function setSmtpHost(?string $smtpHost): self { $this->smtpHost = $smtpHost; return $this; }
+    
+    public function getSmtpPort(): ?int { return $this->smtpPort; }
+    public function setSmtpPort(?int $smtpPort): self { $this->smtpPort = $smtpPort; return $this; }
+    
+    public function getSmtpUsername(): ?string { return $this->smtpUsername; }
+    public function setSmtpUsername(?string $smtpUsername): self { $this->smtpUsername = $smtpUsername; return $this; }
+    
+    public function getSmtpPassword(): ?string { return $this->smtpPassword; }
+    public function setSmtpPassword(?string $smtpPassword): self { $this->smtpPassword = $smtpPassword; return $this; }
+    
+    public function getSmtpEncryption(): ?string { return $this->smtpEncryption; }
+    public function setSmtpEncryption(?string $smtpEncryption): self { $this->smtpEncryption = $smtpEncryption; return $this; }
+    
+    public function getSmtpFromEmail(): ?string { return $this->smtpFromEmail; }
+    public function setSmtpFromEmail(?string $smtpFromEmail): self { $this->smtpFromEmail = $smtpFromEmail; return $this; }
+    
+    public function getSmtpFromName(): ?string { return $this->smtpFromName; }
+    public function setSmtpFromName(?string $smtpFromName): self { $this->smtpFromName = $smtpFromName; return $this; }
+}
+```
+
+### Using SMTP Configuration
+
+After installation, SMTP settings are available in two ways:
+
+#### 1. From User Entity
+
+Access SMTP settings from the authenticated user:
+
+```php
+$user = $this->getUser();
+$smtpHost = $user->getSmtpHost();
+$smtpPort = $user->getSmtpPort();
+// Configure mailer with these settings...
+```
+
+#### 2. From Config File
+
+The installer also creates `config/smtp.yaml`:
+
+```yaml
+parameters:
+    mailer_transport: smtp
+    mailer_host: smtp.gmail.com
+    mailer_port: 587
+    mailer_user: your-email@gmail.com
+    mailer_password: your-app-password
+    mailer_encryption: tls
+    mailer_from_email: noreply@example.com
+    mailer_from_name: My Application
+```
+
+You can use these parameters in your Symfony mailer configuration:
+
+```yaml
+# config/packages/mailer.yaml
+framework:
+    mailer:
+        dsn: '%env(resolve:MAILER_DSN)%'
+
+# Or use the parameters directly:
+# framework:
+#     mailer:
+#         transports:
+#             main: 
+#                 smtp://%mailer_user%:%mailer_password%@%mailer_host%:%mailer_port%
+```
+
+### SMTP Configuration Without User Entity Fields
+
+If you don't want SMTP fields in your User entity, that's fine! The installer will:
+- Still show the SMTP configuration step
+- Save settings to `config/smtp.yaml` only
+- Skip trying to save to the User entity
+
+The installer gracefully handles missing fields - no errors will occur.
 
 ---
 
@@ -304,6 +479,7 @@ The bundle exposes the following API endpoints:
 - `POST /install/api/database-config` - Save database configuration
 - `POST /install/api/install-tables` - Create database tables
 - `POST /install/api/create-admin` - Create admin user
+- `POST /install/api/smtp-config` - Save SMTP configuration (optional)
 - `POST /install/api/app-config` - Save app configuration
 - `GET /install/api/status` - Get installation status
 
