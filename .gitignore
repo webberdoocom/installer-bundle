@@ -4,7 +4,7 @@
 /assets/node_modules/
 
 # Build files
-/src/Resources/public/
+# /src/Resources/public/ - MUST be tracked for Composer distribution
 /public/
 /assets/dist/
 

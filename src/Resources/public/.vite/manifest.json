@@ -1,0 +1,11 @@
+{
+  "src/main.jsx": {
+    "file": "js/app.js",
+    "name": "app",
+    "src": "src/main.jsx",
+    "isEntry": true,
+    "css": [
+      "css/app.css"
+    ]
+  }
+}
