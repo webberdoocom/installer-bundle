@@ -34,14 +34,16 @@ class InstallerExtension extends Extension implements PrependExtensionInterface
 
     public function prepend(ContainerBuilder $container): void
     {
-        // Register Twig namespace for templates
-        $bundlePath = dirname(__DIR__) . '/Resources/views';
+        // Register Twig namespace for templates using absolute path
+        $bundlePath = realpath(dirname(__DIR__) . '/Resources/views');
         
-        $container->prependExtensionConfig('twig', [
-            'paths' => [
-                $bundlePath => 'Installer',
-            ],
-        ]);
+        if ($bundlePath !== false) {
+            $container->prependExtensionConfig('twig', [
+                'paths' => [
+                    $bundlePath => 'Installer',
+                ],
+            ]);
+        }
     }
 
     public function getAlias(): string
