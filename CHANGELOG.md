@@ -106,6 +106,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.3.1] - 2025-01-18
+
+### Fixed
+- **Critical:** Fixed template path resolution issue by correcting `getPath()` method in `InstallerBundle`
+- Template loading now works correctly on production servers
+- Resolved "Unable to find template install/install.html.twig" error
+
+---
+
 ## [Unreleased]
 
 ### Planned Features

@@ -22,7 +22,7 @@ class InstallerBundle extends AbstractBundle
 
     public function getPath(): string
     {
-        return \dirname(__DIR__);
+        return __DIR__;
     }
 
     public function getContainerExtension(): ?InstallerExtension
